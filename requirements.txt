@@ -1,0 +1,8 @@
+numpy
+scikit-learn
+imbalanced-learn
+opencv-python
+onnxruntime
+# torch
+# torchvision
+# torchaudio
