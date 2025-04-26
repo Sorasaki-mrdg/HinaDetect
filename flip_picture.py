@@ -4,7 +4,7 @@ import cv2
 import os
 
 # 设置指定的目录路径
-directory = 'train_positive'  # 请替换为你的目录路径
+directory = 'extra_data/positive'  # 请替换为你的目录路径
 
 # 遍历目录下所有文件
 for filename in os.listdir(directory):
