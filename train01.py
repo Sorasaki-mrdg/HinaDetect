@@ -5,6 +5,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
+from charset_normalizer import models
 from torch.utils.data import Dataset, DataLoader, WeightedRandomSampler
 import torchvision.transforms as transforms
 from sklearn.metrics import accuracy_score, f1_score, confusion_matrix, precision_score, recall_score
@@ -14,6 +15,7 @@ from torch.optim.lr_scheduler import ReduceLROnPlateau
 
 # 设置日志
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
 
 # 处理GIF图像，提取每一帧并保存为JPG格式
 def process_gif(gif_path, output_dir):
@@ -29,7 +31,7 @@ def process_gif(gif_path, output_dir):
             rgb_frame.save(frame_path, 'JPEG')
             logging.info(f"Saved frame {frame_num} to {frame_path}")
             frame_num += 1
-            #只提取第一帧
+            # 只提取第一帧
             break
         gif.close()
         os.remove(gif_path)
@@ -38,6 +40,7 @@ def process_gif(gif_path, output_dir):
         logging.error(f"Failed to delete {gif_path}: {e}")
     except Exception as e:
         logging.error(f"Error processing {gif_path}: {e}")
+
 
 # 转换非JPG图像为JPG格式
 def convert_images_to_jpg(directory):
@@ -55,6 +58,7 @@ def convert_images_to_jpg(directory):
                 logging.info(f"Deleted original file: {image_file}")
             except Exception as e:
                 logging.error(f"Error converting {image_file}: {e}")
+
 
 # 自定义数据集
 class SeiaDataset(Dataset):
@@ -85,6 +89,7 @@ class SeiaDataset(Dataset):
             logging.error(f"Error loading image {image_path}: {e}")
             return None  # 跳过损坏图像
 
+
 # 数据增强
 train_transform = transforms.Compose([
     transforms.RandomResizedCrop(224, scale=(0.8, 1.0)),  # 保留更多特征
@@ -101,6 +106,7 @@ val_transform = transforms.Compose([
     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 ])
 
+
 # 创建加权采样器以平衡数据集
 def create_weighted_sampler(dataset):
     labels = [label for _, label in dataset if label is not None]
@@ -108,6 +114,7 @@ def create_weighted_sampler(dataset):
     weights = 1.0 / class_counts[labels]
     sampler = WeightedRandomSampler(weights, len(weights), replacement=True)
     return sampler
+
 
 # 评估并收集错误样本
 def evaluate_and_collect_mistakes(model, data_loader, device):
@@ -142,6 +149,7 @@ def evaluate_and_collect_mistakes(model, data_loader, device):
     logging.info(f"Confusion Matrix:\n{conf_matrix}")
     return running_loss / len(data_loader), accuracy, mistakes
 
+
 # 微调模型
 def fine_tune_model(model, mistakes, device):
     model.train()
@@ -164,8 +172,9 @@ def fine_tune_model(model, mistakes, device):
             loss.backward()
             optimizer.step()
             running_loss += loss.item()
-        logging.info(f"Fine-tune Epoch [{epoch+1}/3], Loss: {running_loss/len(loader):.4f}")
+        logging.info(f"Fine-tune Epoch [{epoch + 1}/3], Loss: {running_loss / len(loader):.4f}")
     return True
+
 
 # 训练模型
 def train_model(model, train_loader, val_loader, epochs, device, best_model_path, iteration):
@@ -173,7 +182,8 @@ def train_model(model, train_loader, val_loader, epochs, device, best_model_path
     optimizer = optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-5)
     scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=3, verbose=True)
     criterion = nn.CrossEntropyLoss(weight=torch.tensor([1.0, 2.0]).to(device))
-    best_val_loss = float('inf') if iteration == 0 else torch.load(best_model_path)['val_loss'] if os.path.exists(best_model_path) else float('inf')
+    best_val_loss = float('inf') if iteration == 0 else torch.load(best_model_path)['val_loss'] if os.path.exists(
+        best_model_path) else float('inf')
     patience = 5
     no_improvement = 0
 
@@ -194,8 +204,9 @@ def train_model(model, train_loader, val_loader, epochs, device, best_model_path
 
         # 验证并检查是否需要微调
         val_loss, val_acc, mistakes = evaluate_and_collect_mistakes(model, val_loader, device)
-        logging.info(f"Iteration {iteration}, Epoch [{epoch+1}/{epochs}], Train Loss: {running_loss/len(train_loader):.4f}, "
-                     f"Val Loss: {val_loss:.4f}, Val Acc: {val_acc:.4f}")
+        logging.info(
+            f"Iteration {iteration}, Epoch [{epoch + 1}/{epochs}], Train Loss: {running_loss / len(train_loader):.4f}, "
+            f"Val Loss: {val_loss:.4f}, Val Acc: {val_acc:.4f}")
 
         # 如果验证集准确率低于 0.9，触发微调
         if val_acc < 0.9 and mistakes:
@@ -213,12 +224,38 @@ def train_model(model, train_loader, val_loader, epochs, device, best_model_path
         else:
             no_improvement += 1
             if no_improvement >= patience:
-                logging.info(f"Early stopping at epoch {epoch+1}")
+                logging.info(f"Early stopping at epoch {epoch + 1}")
                 break
 
         scheduler.step(val_loss)
 
     return val_acc
+
+
+class ResNetWithPreConv(nn.Module):
+    def __init__(self):
+        super(ResNetWithPreConv, self).__init__()
+        # 添加额外的卷积层来处理更大的输入尺寸
+        self.extra_conv = nn.Sequential(
+            nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3),  # 调整输入图像尺寸
+            nn.BatchNorm2d(64),
+            nn.ReLU(inplace=True),
+        )
+        # 加载ResNet50模型
+        self.resnet50 = torch.hub.load('pytorch/vision:v0.10.0', 'resnet50', weights='IMAGENET1K_V2')
+
+        # 保留ResNet50的其余部分不变
+        num_features = self.resnet50.fc.in_features
+        self.resnet50.fc = nn.Linear(num_features, 2)  # 修改输出为2类别
+
+    def forward(self, x):
+        # 通过额外的卷积层处理输入图像
+        x = self.extra_conv(x)
+
+        # 传递给ResNet50
+        x = self.resnet50(x)
+        return x
+
 
 def main():
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -239,6 +276,7 @@ def main():
 
     # 加载模型
     model = torch.hub.load('pytorch/vision:v0.10.0', 'resnet50', weights='IMAGENET1K_V2')
+    # model = ResNetWithPreConv()
     num_features = model.fc.in_features
     model.fc = nn.Linear(num_features, 2)
     model = model.to(device)
@@ -273,7 +311,8 @@ def main():
 
     # 重复划分验证集和训练，直到准确率达标或达到最大迭代次数
     while val_acc < target_accuracy and iteration < max_retrain_iterations:
-        logging.info(f"Validation accuracy {val_acc:.4f} is below {target_accuracy}, re-splitting dataset for iteration {iteration}...")
+        logging.info(
+            f"Validation accuracy {val_acc:.4f} is below {target_accuracy}, re-splitting dataset for iteration {iteration}...")
         train_dataset, val_dataset = torch.utils.data.random_split(dataset, [train_size, val_size])
         val_dataset.dataset.transform = val_transform
         train_sampler = create_weighted_sampler(train_dataset)
@@ -293,9 +332,10 @@ def main():
     dummy_input = torch.randn(1, 3, 224, 224).to(device)
     onnx_path = './best_seia_model.onnx'
     torch.onnx.export(model, dummy_input, onnx_path, verbose=True, input_names=['input'],
-                    output_names=['output'])
-    
+                      output_names=['output'])
+
     logging.info(f"Exported best model to ONNX format: {onnx_path}")
+
 
 if __name__ == '__main__':
     main()
