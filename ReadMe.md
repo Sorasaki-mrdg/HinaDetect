@@ -11,6 +11,10 @@
 
 ## 模型使用方法
 
+2025/5/23更新：基于本仓库的模型编写的astrbot的插件：  
+[astrbot_plugin_seiadetect](https://github.com/orchidsziyou/astrbot_plugin_seiadetect)
+
+
 ### 环境准备
 参考requirements.txt安装所需的依赖库
 
@@ -28,11 +32,16 @@
 若不使用ONNXRuntime库进行推理，本仓库也提供了.pth模型文件，可以直接使用pytorch进行推理，推理代码参考run.py(代码来源@spawner1145)
 
 ## 存在问题
-模型可能会把教授(ニヤニヤ教授)，藤田琴音等人物也检测为seia。
+模型可能会把教授(ニヤニヤ教授)，玛丽等黄毛兽耳人物也检测为seia。
 
 ## 模型效果
 由于篇幅问题，以下展示了我的bot应用中的效果：
 
 （如果图片未显示，可能是路径问题，请检查图片路径）
 ![pic1](pic1.jpg)
+
+![pic2](img_1.jpg)
+
+未检测出seia的时候，没有回应.
+![pic3](img_2.png)
 
