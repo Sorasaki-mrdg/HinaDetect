@@ -40,7 +40,7 @@
 （如果图片未显示，可能是路径问题，请检查图片路径）
 ![pic1](pic1.jpg)
 
-![pic2](img_1.jpg)
+![pic2](img_1.png)
 
 未检测出seia的时候，没有回应.
 ![pic3](img_2.png)
