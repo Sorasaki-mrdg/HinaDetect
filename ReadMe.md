@@ -1,4 +1,4 @@
-# Seia Detection Model
+# Seia Detect Model 检测百合园圣娅的模型
 
 ## 模型/代码来源
 
