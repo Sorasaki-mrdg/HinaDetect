@@ -4,10 +4,9 @@ import cv2
 import onnxruntime as ort
 import numpy as np
 
-def load_model():
+def load_model(onnx_model_path):
     # 加载 ONNX 模型
     global ort_session
-    onnx_model_path = 'best_seia_model.onnx'
     ort_session = ort.InferenceSession(onnx_model_path)
 
 
@@ -58,7 +57,7 @@ def get_all_files(directory):
     return all_files
 
 if __name__ == '__main__':
-    load_model()
+    load_model('best_hina_model.onnx')
     files=get_all_files('input')
     # print(files)
     for file in files:

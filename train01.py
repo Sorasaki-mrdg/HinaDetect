@@ -180,7 +180,7 @@ def fine_tune_model(model, mistakes, device):
 def train_model(model, train_loader, val_loader, epochs, device, best_model_path, iteration):
     model.train()
     optimizer = optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-5)
-    scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=3, verbose=True)
+    scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=3)
     criterion = nn.CrossEntropyLoss(weight=torch.tensor([1.0, 2.0]).to(device))
     best_val_loss = float('inf') if iteration == 0 else torch.load(best_model_path)['val_loss'] if os.path.exists(
         best_model_path) else float('inf')
@@ -290,9 +290,9 @@ def main():
         param.requires_grad = True
 
     # 训练和重复验证参数
-    best_model_path = './best_seia_model.pth'
-    max_retrain_iterations = 5  # 最大重新划分次数
-    target_accuracy = 0.95  # 目标准确率
+    best_model_path = './best_hina_model.pth'
+    max_retrain_iterations = 20  # 最大重新划分次数
+    target_accuracy = 0.98  # 目标准确率
     initial_epochs = 20  # 初次训练轮数
     retrain_epochs = 10  # 每次重新训练轮数
 
@@ -330,7 +330,7 @@ def main():
     # 导出为ONNX格式
     model.eval()
     dummy_input = torch.randn(1, 3, 224, 224).to(device)
-    onnx_path = './best_seia_model.onnx'
+    onnx_path = './best_hina_model.onnx'
     torch.onnx.export(model, dummy_input, onnx_path, verbose=True, input_names=['input'],
                       output_names=['output'])
 
