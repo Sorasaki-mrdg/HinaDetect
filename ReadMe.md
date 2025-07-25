@@ -1,8 +1,8 @@
-# Seia Detect Model 检测百合园圣娅的模型
+# Hina Detect Model
 
 ## 模型/代码来源
 
-该模型基于[spawner1145](https://github.com/spawner1145)的仓库[NailongRecognizeRL](https://github.com/spawner1145/NailongRecognizeRL)训练而来，并根据 GNU Affero General Public License (AGPL) 版本 3 进行发布。
+该模型基于[orchidsziyou](https://github.com/orchidsziyou)的仓库[SeiaDetectModel](https://github.com/orchidsziyou/SeiaDetectModel)训练而来，其基于[spawner1145](https://github.com/spawner1145)的仓库[NailongRecognizeRL](https://github.com/spawner1145/NailongRecognizeRL)，根据 GNU Affero General Public License (AGPL) 版本 3 进行发布。
 
 ## 模型介绍
 该模型基于预训练的ResNet-50模型，使用了我个人收集的200+张 **百合园圣娅** 的图片跟1k+张由我的QQbot接受到的各种图片训练而来，可以检测出包含seia的图。
