@@ -25,7 +25,7 @@ if __name__ == '__main__':
                         try:
                             # 使用 ONNX 模型进行推理
                             pred, confidence = PredictONNX.predict_image(file_path)
-                            print(f"File: {file_path} | Prediction: {'是hina' if pred else '啊哈哈，不知道'} | Confidence: {confidence}")
+                            print(f"File: {file_path} | Prediction: {'是hina' if pred else '啊哈哈'} | Confidence: {confidence}")
                         except Exception as e:
                             print(f"Error processing {file_path}: {e}")
                     except Exception as e:
@@ -42,7 +42,7 @@ if __name__ == '__main__':
                 image.save(temp_path)
                 # 调用预测函数
                 pred, confidence = PredictONNX.predict_image(temp_path)
-                print(f"File: {temp_path} | Prediction: {'是hina' if pred else '啊哈哈，不知道'} | Confidence: {confidence}")
+                print(f"File: {temp_path} | Prediction: {'是hina' if pred else '啊哈哈'} | Confidence: {confidence}")
                 os.remove(temp_path)
             except Exception as e:
                 print(f"Error processing {temp_path}: {e}")

@@ -36,5 +36,8 @@
 
 
 ## 模型效果
+可以认出穿圣娅泳装的hina pid:133158368
+![hina1.jpg](hina1.jpg)
 
-
+穿hina衣服的星野可以认出不是hina pid:132695434
+![hina2.jpg](hina2.jpg)
