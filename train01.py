@@ -290,9 +290,9 @@ def main():
         param.requires_grad = True
 
     # 训练和重复验证参数
-    best_model_path = './best_hina_model.pth'
+    best_model_path = './best_hina_model1.pth'
     max_retrain_iterations = 20  # 最大重新划分次数
-    target_accuracy = 0.98  # 目标准确率
+    target_accuracy = 0.99  # 目标准确率
     initial_epochs = 20  # 初次训练轮数
     retrain_epochs = 10  # 每次重新训练轮数
 
@@ -330,7 +330,7 @@ def main():
     # 导出为ONNX格式
     model.eval()
     dummy_input = torch.randn(1, 3, 224, 224).to(device)
-    onnx_path = './best_hina_model.onnx'
+    onnx_path = './best_hina_model1.onnx'
     torch.onnx.export(model, dummy_input, onnx_path, verbose=True, input_names=['input'],
                       output_names=['output'])
 
