@@ -5,7 +5,7 @@ import os
 import shutil
 
 if __name__ == '__main__':
-    PredictONNX.load_model('best_hina_model.onnx')
+    PredictONNX.load_model('best_hina_model1.onnx')
     while True:
         image = ImageGrab.grabclipboard()
         if image is None:

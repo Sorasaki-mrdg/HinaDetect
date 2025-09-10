@@ -57,7 +57,7 @@ def get_all_files(directory):
     return all_files
 
 if __name__ == '__main__':
-    load_model('best_hina_model.onnx')
+    load_model('best_hina_model1.onnx')
     files=get_all_files('input')
     # print(files)
     for file in files:

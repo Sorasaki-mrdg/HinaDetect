@@ -13,6 +13,8 @@
 
 2025/5/23更新：基于本仓库的模型编写的astrbot的插件：  
 [astrbot_plugin_seiadetect](https://github.com/orchidsziyou/astrbot_plugin_seiadetect)
+修改后的hinadetect插件：  
+[astrbot_plugin_hinadetect](https://github.com/Sorasaki-mrdg/astrbot_plugin_hinadetect)
 
 
 ### 环境准备

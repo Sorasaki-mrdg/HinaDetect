@@ -56,14 +56,16 @@ def predict_image(image_path):
     return pred.item() == 1, ort_outs[0][0][1]
 
 def get_all_image_files(directory):
-    """获取目录中所有支持的图片文件"""
+    """获取目录中所有支持的图片文件（不包含子文件夹）"""
     all_files = []
-    for root, dirs, files in os.walk(directory):
-        for file in files:
+    # 只遍历指定目录，不递归子目录
+    for file in os.listdir(directory):
+        file_path = os.path.join(directory, file)
+        # 检查是否为文件（不是目录）
+        if os.path.isfile(file_path):
             file_ext = os.path.splitext(file)[1].lower()
             if file_ext in SUPPORTED_EXTENSIONS:
                 try:
-                    file_path = os.path.join(root, file)
                     # 验证文件可读性
                     with open(file_path, 'rb') as f:
                         pass
